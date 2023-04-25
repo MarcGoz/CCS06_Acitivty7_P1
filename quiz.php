@@ -1,26 +1,24 @@
 <?php
 
-
 require "vendor/autoload.php";
-
 
 session_start();
 
-
-// 3.
-
-
 use App\QuestionManager;
-
 
 $number = null;
 $question = null;
-
 
 try {
     $manager = new QuestionManager;
     $manager->initialize();
 
+    $questions = [];
+
+    for ($number = 1; $number <= 10; $number++) {
+        $question = $manager->retrieveQuestion($number);
+        array_push($questions, $question);
+    }
 
     if (isset($_SESSION['is_quiz_started'])) {
         $number = $_SESSION['current_question_number'];
@@ -31,12 +29,10 @@ try {
         $number = 1;
     }
 
-
     if (isset($_POST['answer'])) {
         $_SESSION['answers'][$number] = $_POST['answer'];
         $number++;
     }
-
 
     // Has user answered all items
     if ($number > $manager->getQuestionSize()) {
@@ -44,11 +40,10 @@ try {
         exit;
     }
 
-
     // Marker for question number
     $_SESSION['current_question_number'] = $number;
 
-
+    
     $question = $manager->retrieveQuestion($number);
 } catch (Exception $e) {
     echo '<h1>An error occurred:</h1>';
@@ -56,7 +51,6 @@ try {
     exit;
 }
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -80,35 +74,33 @@ try {
 
 
 
+<form method = "POST" action="result.php">
 
-<h1>Question #<?php echo $question->getNumber(); ?></h1>
-<h2 style="color: blue"><?php echo $question->getQuestion(); ?></h2>
-<h4 style="color: blue">Choices</h4>
-<form method="POST" action="quiz.php">
-<input type="hidden" name="number" value="<?php echo $question->getNumber();?>" />
+<?php foreach ($questions as $question): ?>
+    <h1>Question #<?php echo $question->getNumber(); ?></h1>
+    <h2 style = "color: blue"><?php echo $question->getQuestion(); ?></h2>
+    <h4 style = "color: blue">Choices</h4>
+    <?php foreach ($question->getChoices() as $choice): ?>
+     
+    <input
+        type="radio"
+        name="<?php echo $question->getNumber(); ?>"
+        value="<?php echo $choice->letter; ?>" />
+        <?php echo $choice->letter; ?>)
+    <?php echo $choice->label;?><br />
 
-
-<?php foreach ($question->getChoices() as $choice): ?>
-
-
-<input
-    type="radio"
-    name="answer"
-    value="<?php echo $choice->letter; ?>" />
-    <?php echo $choice->letter; ?>)
-<?php echo $choice->label; ?><br />
-
-
+    <?php endforeach; ?>
 <?php endforeach; ?>
 
 
-<input type="submit" value="Next">
+
+<br>
+<input type="submit" value="Submit All Answers">
 </form>
 
 
 </body>
 </html>
-
 
 <!-- DEBUG MODE -->
 <pre>

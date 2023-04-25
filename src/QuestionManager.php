@@ -77,13 +77,10 @@ class QuestionManager
 
         return $score;
     }
-    public function getChoices()
-{
-    return $this->choices;
-}
-public function Question($answers)
+    public function Question($answers)
     {
         $y = 1;
+
         foreach ($answers as $number => $answer) {
             if ($answer == $this->answers[$number]) {               
                 echo $y . "." . $answer . '<span style="color:blue"> (correct)</span>' . "<br>";
@@ -93,19 +90,5 @@ public function Question($answers)
                 $y++;
             }
         }
-    }
-    public function results($answers)
-    {
-        $c_questions = array();
-
-        foreach ($answers as $number => $answer) {
-			if ($answer == $this->answers[$number]) {
-				$c_questions[$number] = array($answer, 1);
-            }else{
-				$c_questions[$number] = array($answer, 0);
-			}
-        }
-
-        return $c_questions;
     }
 }
